@@ -50,6 +50,7 @@ app.use(express.json());
  */
 app.get("/api/customers/:id", (req: Request, res: Response): void => {
     const customerId: number = parseInt(req.params.id);
+    console.log('id=> ', customerId)
     const customer: Customer | undefined = customers.find(
         (c) => c.id === customerId
     );
@@ -124,5 +125,22 @@ app.patch(
         res.json(customer);
     }
 );
+
+/**
+ * Retrieve all customers by ID.
+ * @route GET /api/customers
+ * @param req - Express request object
+ * @param res - Express response object
+ */
+app.get("/api/customers", (req: Request, res: Response): void => {
+
+    const responseObject = {
+        customers: customers,
+        customerCount: customers.length
+    }
+
+    res.json(responseObject);
+});
+
 
 export default app;
