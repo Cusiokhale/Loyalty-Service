@@ -143,4 +143,44 @@ app.get("/api/customers", (req: Request, res: Response): void => {
 });
 
 
+/**
+ * Record adjust for a customer and update status based on points.
+ * @route POST /api/customers/:id/adjust-points
+ * @param req - Express request object
+ * @param res - Express response object
+ */
+app.post("/api/customers/:id/adjust-points", (req: Request, res: Response): void => {
+    const customerId: number = parseInt(req.params.id);
+    const customer: Customer | undefined = customers.find(
+        (c) => c.id === customerId
+    );
+    if (!customer) {
+        res.status(404).send("Customer not found");
+        return;
+    }
+
+    const pointsChange: number = req.body.pointsChange;
+
+    let updatedPoints = customer.points + pointsChange;
+
+    if (updatedPoints < 0) {
+        updatedPoints = 0;
+    }
+
+    customer.points = updatedPoints;
+
+    if (customer.points < 500) {
+        customer.status = "BRONZE";
+        customer.lastStatusChange = new Date().toISOString();
+    } else if (customer.points >= 750) {
+        customer.status = "GOLD";
+        customer.lastStatusChange = new Date().toISOString();
+    } else if (customer.points >= 500) {
+        customer.status = "SILVER";
+        customer.lastStatusChange = new Date().toISOString();
+    }
+
+    res.json(customer);
+});
+
 export default app;
